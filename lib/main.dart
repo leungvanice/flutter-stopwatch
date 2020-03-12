@@ -58,17 +58,6 @@ class _StopwatchAppState extends State<StopwatchApp> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    if (stopwatch.isRunning) {
-      Timer.periodic(Duration(seconds: 1), (callback) {
-        widget.valueNotifier.value =
-            format(Duration(milliseconds: stopwatch.elapsedMilliseconds));
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       child: !stopwatch.isRunning
@@ -101,6 +90,10 @@ class _StopwatchAppState extends State<StopwatchApp> {
                       print("Started");
                     }
                     setState(() {});
+                    Timer.periodic(Duration(seconds: 1), (callback) {
+                      widget.valueNotifier.value = format(Duration(
+                          milliseconds: stopwatch.elapsedMilliseconds));
+                    });
                   },
                 ),
               ],
