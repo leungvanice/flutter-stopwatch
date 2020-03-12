@@ -53,7 +53,7 @@ class TimerPageState extends State<TimerPage> {
     });
   }
 
-  // UI 
+  // Building Btn functions
   Widget buildFloatingButton(String text, VoidCallback callback) {
     TextStyle roundTextStyle = const TextStyle(fontSize: 16.0, color: Colors.white);
     return new FloatingActionButton(

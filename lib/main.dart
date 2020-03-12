@@ -5,6 +5,10 @@ import 'timer_page.dart';
 
 void main() => runApp(MyApp());
 
+class MyStopWatch {
+  static final Stopwatch stopwatch = Stopwatch();
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -38,51 +42,98 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class StopwatchApp extends StatelessWidget {
+class StopwatchApp extends StatefulWidget {
   ValueNotifier valueNotifier;
   StopwatchApp(this.valueNotifier);
-  Stopwatch stopwatch = Stopwatch();
+
+  @override
+  _StopwatchAppState createState() => _StopwatchAppState();
+}
+
+class _StopwatchAppState extends State<StopwatchApp> {
+  Stopwatch stopwatch = MyStopWatch.stopwatch;
+
   format(Duration d) {
     return d.toString().split('.').first.padLeft(8, '0');
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (stopwatch.isRunning) {
+      Timer.periodic(Duration(seconds: 1), (callback) {
+        widget.valueNotifier.value =
+            format(Duration(milliseconds: stopwatch.elapsedMilliseconds));
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      // width: MediaQuery.of(context).size.width * 0.5,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          FloatingActionButton(
-            child: Text("Start"),
-            onPressed: () {
-              if (stopwatch.isRunning) {
-                print("Started already");
-              } else {
-                stopwatch.start();
-                print("Started");
-              }
-              Timer.periodic(Duration(seconds: 1), (callback) {
-                valueNotifier.value = format(
-                    Duration(milliseconds: stopwatch.elapsedMilliseconds));
-              });
-            },
-          ),
-          SizedBox(
-            width: 100,
-          ),
-          FloatingActionButton(
-            child: Text("Stop"),
-            onPressed: () {
-              if (stopwatch.isRunning) {
-                stopwatch.stop();
-                stopwatch.reset();
-                valueNotifier.value = '00:00:00';
-              }
-            },
-          ),
-        ],
-      ),
+      child: !stopwatch.isRunning
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                // Reset btn
+                FloatingActionButton(
+                  child: Text("Reset"),
+                  onPressed: () {
+                    stopwatch.reset();
+                    widget.valueNotifier.value = '00:00:00';
+
+                    setState(() {
+                      widget.valueNotifier.value = '00:00:00';
+                    });
+                  },
+                ),
+                SizedBox(
+                  width: 100,
+                ),
+                // Start btn
+                FloatingActionButton(
+                  child: Text('Start'),
+                  onPressed: () {
+                    if (stopwatch.isRunning) {
+                      print("Started already");
+                    } else {
+                      stopwatch.start();
+                      print("Started");
+                    }
+                    setState(() {});
+                  },
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                // lap btn
+                FloatingActionButton(
+                  child: Text("lap"),
+                  onPressed: () {
+                    if (stopwatch.isRunning) {
+                      print(format(Duration(
+                          milliseconds: stopwatch.elapsedMilliseconds)));
+                    }
+                    setState(() {});
+                  },
+                ),
+                SizedBox(
+                  width: 100,
+                ),
+                // Start btn
+                FloatingActionButton(
+                  child: Text("stop"),
+                  onPressed: () {
+                    if (stopwatch.isRunning) {
+                      stopwatch.stop();
+                    }
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
     );
   }
 }
